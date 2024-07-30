@@ -1,0 +1,12 @@
+alias stinson="export ANDROID_SERIAL=2G0YC0TF0X000M"
+alias phone="export ANDROID_SERIAL=R5CR321E9XB"
+alias nodevice="export ANDROID_SERIAL="
+alias quest="export ANDROID_SERIAL=1WMHH8125M0326"
+alias ventura="export ANDROID_SERIAL=340YCKGG2H00BG"
+
+#alias download-last-video="adb pull /sdcard/oculus/Videoshots/\`adb shell 'ls -t /sdcard/oculus/Videoshots/ | head -n1'\` $HOME/Downloads/"
+
+source ~/fbsource/fbandroid/scripts/oculus/socialplatform/aliases
+
+stinson
+echo "Set stinson as default adb device"
