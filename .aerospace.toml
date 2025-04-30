@@ -5,6 +5,7 @@ enable-normalization-opposite-orientation-for-nested-containers = false
 
 [mode.main.binding]
 alt-shift-enter = 'exec-and-forget open -n /Applications/iTerm.app'
+alt-shift-g = 'exec-and-forget ~/scripts/remove-ghost-windows.sh'
 
 alt-j = 'focus left'
 alt-k = 'focus down'
@@ -33,6 +34,7 @@ alt-e = 'layout tiles horizontal vertical' # 'layout toggle split' in i3a
 
 alt-shift-space = 'layout floating tiling' # 'floating toggle' in i3
 alt-shift-r = 'flatten-workspace-tree'
+alt-shift-z = 'close-all-windows-but-current'
 
 # Not supported, because this command is redundant in AeroSpace mental model.
 # See: https://nikitabobko.github.io/AeroSpace/guide#floating-windows
