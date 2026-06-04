@@ -96,9 +96,6 @@ eval "$(starship init zsh)"
 
 export PATH="/Users/ralston/.lmstudio/bin:$PATH"
 
-# Elasticsearch (Elastic Cloud - Pietra)
-export ELASTICSEARCH_URL="https://pietra-log.es.us-east-2.aws.elastic-cloud.com"
-export ELASTICSEARCH_API_KEY="UlVUd2FKMEJ2ZGV0R18wNEJ3YUE6amxxUldqbUtXYnZyRTVsWmtSNFIyQQ=="
 
 # aws cli completions?
 # /opt/homebrew/share/zsh/site-functions
