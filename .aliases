@@ -1,2 +1,33 @@
 alias cleanpaste='pbpaste | sed "s/[[:space:]]*$//" | pbcopy'
 
+wtree() { pnpm worktree -o "$1" "${2:-origin/main}"; }
+
+# ds <ref> — is this commit live? For each stable environment (skips *preview*), finds the SHA
+# currently deployed there and reports whether <ref> is contained in it. Remote, not local.
+ds() {
+  local ref="$1" repo target envs env id sha dref state live liveref behind pos
+  [[ -n "$ref" ]] || { print -u2 "usage: ds <sha|branch|tag>"; return 1; }
+  repo=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null) || {
+    print -u2 "ds: run inside a GitHub repo"; return 1; }
+  target=$(gh api "repos/$repo/commits/$ref" --jq .sha 2>/dev/null) || {
+    print -u2 "ds: '$ref' is not a commit in $repo"; return 1; }
+  print "target ${target:0:7} ($ref) — is it live?"
+  envs=$(gh api "repos/$repo/deployments?per_page=100" --jq '[.[].environment] | unique | .[]' | grep -v preview)
+  for env in ${(f)envs}; do
+    live="" liveref=""
+    # newest deployment in this env whose latest status is success = what's live now
+    while IFS=$'\t' read -r id sha dref; do
+      state=$(gh api "repos/$repo/deployments/$id/statuses" --jq '.[0].state')
+      [[ "$state" == success ]] && { live=$sha; liveref=$dref; break; }
+    done <<< "$(gh api "repos/$repo/deployments?environment=$env&per_page=10" --jq '.[] | "\(.id)\t\(.sha)\t\(.ref)"')"
+    [[ -n "$live" ]] || { printf '%-20s %s\n' "$env" "no active deployment"; continue; }
+    pos="live=${live:0:7} ($liveref)"
+    # behind_by on target...live counts commits in target not yet in live; 0 == contained
+    behind=$(gh api "repos/$repo/compare/$target...$live" --jq .behind_by 2>/dev/null)
+    if [[ "$behind" == 0 ]]; then
+      printf '%-20s %-32s ✓ live here\n' "$env" "$pos"
+    else
+      printf '%-20s %-32s ✗ not live — %s commit(s) not deployed here yet\n' "$env" "$pos" "$behind"
+    fi
+  done
+}
