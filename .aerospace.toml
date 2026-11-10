@@ -1,10 +1,26 @@
 # Reference: https://github.com/i3/i3/blob/next/etc/config
-# Empty change
+# Mainline AeroSpace config (v0.21.x).
+# The config for the custom fork (workspace-cycle-recent) is preserved in .aerospace.custom-fork.toml
+
+# See: https://nikitabobko.github.io/AeroSpace/guide#config-version
+config-version = 2
+
+# config-version 2 no longer infers persistent workspaces from the bindings below,
+# so list them explicitly to keep the previous behavior.
+persistent-workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+                         "T", "U", "I", "O", "P"]
 
 enable-normalization-flatten-containers = false
 enable-normalization-opposite-orientation-for-nested-containers = false
 
 accordion-padding = 0
+
+# Hovering a window focuses it (new in mainline 0.21; only option is `enabled`)
+focus-follows-mouse.enabled = false
+
+# exec-and-forget bindings call `aerospace` and `choose` from Homebrew
+[exec.env-vars]
+PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
 
 [mode.main.binding]
 alt-shift-enter = 'exec-and-forget open -n /Applications/iTerm.app'
@@ -50,9 +66,15 @@ alt-shift-z = 'close-all-windows-but-current'
 
 # workspace_name_0 = 'coding'
 
-# alt-tab = 'workspace-back-and-forth'
-alt-tab = 'workspace-cycle-recent next'
-alt-shift-tab = 'workspace-cycle-recent prev'
+# Cycle through the non-empty workspaces on the focused monitor (replaces the fork's `workspace-cycle-recent`).
+# WorkspaceSwitcher (~/beast/workspace-switcher) shows an alt-tab style overlay of workspace thumbnails:
+# hold alt, press tab to move the selection, release alt to switch. With its agent not running it does the
+# plain cycle below, so these bindings never go dead.
+alt-tab = 'exec-and-forget ~/Applications/WorkspaceSwitcher.app/Contents/MacOS/WorkspaceSwitcher next'
+alt-shift-tab = 'exec-and-forget ~/Applications/WorkspaceSwitcher.app/Contents/MacOS/WorkspaceSwitcher prev'
+# Plain cycle without the overlay:
+# alt-tab = 'list-workspaces --monitor focused --empty no | workspace --wrap-around --stdin next'
+# alt-shift-tab = 'list-workspaces --monitor focused --empty no | workspace --wrap-around --stdin prev'
 
 alt-1 = 'workspace 1'
 alt-2 = 'workspace 2'
@@ -95,8 +117,8 @@ alt-shift-8 = 'move-node-to-workspace 8'
 alt-shift-9 = 'move-node-to-workspace 9'
 alt-shift-0 = 'move-node-to-workspace 10'
 
-alt-shift-m = '''exec-and-forget /Users/ralston/bin/aerospace list-monitors --format "%{monitor-id} %{monitor-name}" | grep -v "^$(/Users/ralston/bin/aerospace list-monitors --focused --format '%{monitor-id}') " | choose | cut -d' ' -f1 | while read id; do /Users/ralston/bin/aerospace move-workspace-to-monitor "$id"; done'''
-alt-shift-cmd-m = '''exec-and-forget /Users/ralston/bin/aerospace list-monitors --format "%{monitor-id} %{monitor-name}" | grep -v "^$(/Users/ralston/bin/aerospace list-monitors --focused --format '%{monitor-id}') " | choose | cut -d' ' -f1 | while read id; do /Users/ralston/bin/aerospace move-node-to-monitor "$id"; done'''
+alt-shift-m = '''exec-and-forget aerospace list-monitors --format "%{monitor-id} %{monitor-name}" | grep -v "^$(aerospace list-monitors --focused --format '%{monitor-id}') " | choose | cut -d' ' -f1 | while read id; do aerospace move-workspace-to-monitor "$id"; done'''
+alt-shift-cmd-m = '''exec-and-forget aerospace list-monitors --format "%{monitor-id} %{monitor-name}" | grep -v "^$(aerospace list-monitors --focused --format '%{monitor-id}') " | choose | cut -d' ' -f1 | while read id; do aerospace move-node-to-monitor "$id"; done'''
 
 alt-shift-period = 'move-workspace-to-monitor --wrap-around next'
 alt-shift-comma = 'move-workspace-to-monitor --wrap-around prev'
@@ -121,8 +143,8 @@ alt-shift-o = ['move-node-to-workspace O', 'layout floating']
 alt-p = 'workspace P'
 alt-shift-p = ['move-node-to-workspace P', 'layout floating']
 
-alt-n = 'exec-and-forget /Users/ralston/bin/aerospace list-workspaces --all | choose -m | xargs /Users/ralston/bin/aerospace workspace'
-alt-shift-n = 'exec-and-forget /Users/ralston/bin/aerospace list-workspaces --all | choose -m | xargs /Users/ralston/bin/aerospace move-node-to-workspace'
+alt-n = 'exec-and-forget aerospace list-workspaces --all | choose -m | xargs aerospace workspace'
+alt-shift-n = 'exec-and-forget aerospace list-workspaces --all | choose -m | xargs aerospace move-node-to-workspace'
 
 alt-shift-c = 'reload-config'
 
